@@ -85,12 +85,12 @@
     </div>
     <hr class="mt-2 mb-2">
 
-    <!-- --------------------------- Lower Summary Row & Table ------------------- -->
+   <!-- --------------------------- Lower Summary Row & Table ------------------- -->
 
     <div v-if="csvData.length > 0" class="col-12 px-1 bg-success-subtle">
       <div class="w-100 d-flex align-items-center mb-2 p-0 m-0 gap-3">
 
-             <!-- Left Anchor: Select All Checkbox (Perfected alignment padding match) -->
+        <!-- Left Anchor: Select All Checkbox (Perfected alignment padding match) -->
         <div class="flex-shrink-0" style="padding-left: 12px;">
           <label class="d-inline-flex align-items-center fw-bold text-nowrap m-0" style="cursor: pointer; gap: 8px;">
             <input 
@@ -99,10 +99,6 @@
     :checked="isAllFilteredSelected" 
     @change="toggleSelectAllFilteredRows"
 > 
-            <span style="line-height: 1;">Select All</span>
-          </label>
-        </div> 
-              style="margin: 0; padding: 0; vertical-align: middle;">
             <span style="line-height: 1;">Select All</span>
           </label>
         </div>
