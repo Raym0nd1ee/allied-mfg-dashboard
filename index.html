@@ -94,6 +94,12 @@
         <div class="flex-shrink-0" style="padding-left: 12px;">
           <label class="d-inline-flex align-items-center fw-bold text-nowrap m-0" style="cursor: pointer; gap: 8px;">
             <input type="checkbox" id="headerMasterSelect" onchange="toggleSelectAllFilteredRows(this)"
+              <input 
+    type="checkbox" 
+    id="headerMasterSelect" 
+    :checked="isAllFilteredSelected" 
+    @change="toggleSelectAllFilteredRows"
+> 
               style="margin: 0; padding: 0; vertical-align: middle;">
             <span style="line-height: 1;">Select All</span>
           </label>
