@@ -146,40 +146,43 @@ createApp({
             reader.readAsArrayBuffer(file);
         }
         ,
-        async toggleSelectAllFilteredRows(masterCheckbox) {
-            const appElement = document.getElementById('app');
-            if (!appElement || !appElement.__vue_app__) return;
-            const vueInstance = appElement.__vue_app__._instance.proxy;
+       toggleSelectAllFilteredRows(event) {
+    const isChecked = event.target.checked;
 
-            if (masterCheckbox.checked) {
-                const queries = (vueInstance.soSearchQuery || '')
-                    .split(',')
-                    .map(s => s.trim().toLowerCase())
-                    .filter(Boolean);
+    // 1. Calculate which row index sequences match your current screen text filter inputs
+    const filteredIndices = this.csvData
+        .map((row, index) => ({ row, index }))
+        .filter(item => {
+            if (!this.soFilterInput) return true; // Change 'soFilterInput' to your actual search model variable string name
+            return String(item.row.SO || "").toLowerCase().includes(this.soFilterInput.toLowerCase());
+        })
+        .map(item => item.index);
 
-                const targetedIndices = await new Promise((resolve) => {
-                    setTimeout(() => {
-                        const indices = [];
+    // 2. Safely merge index tracking arrays dynamically
+    if (isChecked) {
+        const newSelectionCollection = new Set([...this.selectedCsvIndices, ...filteredIndices]);
+        this.selectedCsvIndices = Array.from(newSelectionCollection);
+    } else {
+        this.selectedCsvIndices = this.selectedCsvIndices.filter(idx => !filteredIndices.includes(idx));
+    }
+},
 
-                        vueInstance.csvData.forEach((row, index) => {
-                            const isMatch = queries.length === 0 || queries.some(query =>
-                                String(row.SO || '').toLowerCase().includes(query)
-                            );
+// Add this alongside your data() or as an evaluation getter inside your methods layer:
+get isAllFilteredSelected() {
+    if (!this.csvData || this.csvData.length === 0) return false;
+    
+    // Check filtered visibility sequences cleanly
+    const filteredIndices = this.csvData
+        .map((row, index) => ({ row, index }))
+        .filter(item => {
+            if (!this.soFilterInput) return true;
+            return String(item.row.SO || "").toLowerCase().includes(this.soFilterInput.toLowerCase());
+        })
+        .map(item => item.index);
 
-                            if (isMatch) {
-                                indices.push(index);
-                            }
-                        });
-
-                        resolve(indices);
-                    }, 0);
-                });
-
-                vueInstance.selectedCsvIndices = targetedIndices;
-            } else {
-                vueInstance.selectedCsvIndices = [];
-            }
-        },
+    if (filteredIndices.length === 0) return false;
+    return filteredIndices.every(idx => this.selectedCsvIndices.includes(idx));
+},
         ...createQcMethods,
         selectDimensionFiles(e) {
 
