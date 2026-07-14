@@ -126,11 +126,13 @@ createApp({
                     console.log("Structured JSON mapping payload ready for Server upload:", structuredPaths);
 
                     // 4. POST the updated path reference JSON configuration file back to your local Flask app
-                    const res = await fetch("http://127.0.0.1:5000/save_paths_json", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ paths: structuredPaths })
-                    });
+                    const res = await fetch(targetUrl, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ records: selectedRowsData })
+                });
 
                     const result = await res.json();
                     if (res.ok && result.success) {
