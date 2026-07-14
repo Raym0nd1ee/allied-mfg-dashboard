@@ -2,30 +2,27 @@
 <html lang="en">
 
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Allied MFG</title>
-  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  
+  <!-- Core Framework CDN Packages -->
+  <script src="https://unpkg.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+  
+  <!-- Visual Stylesheets Layout Configuration -->
+  <link href="https://jsdelivr.net" rel="stylesheet">
   <link rel="stylesheet" href="static/styles.css">
-  <!-- <script src="https://jsdelivr.net"></script> -->
-<!-- 1. Core Framework Packages -->
-<script src="https://unpkg.com"></script>
-<script src="https://jsdelivr.net"></script>
 
-<!-- 🟢 2. ADD THE MISSING METHODS FILE HERE (Change 'qcMethods.js' to your actual file name) -->
-<!-- <script src="static/qcMethods.js"></script> -->
-
-<!-- 3. Main Application Controller (Must be last so it can see the file above) -->
-<script src="static/app.js" defer></script>
+  <!-- Main Application Controller Execution File -->
+  <script src="static/app.js" defer></script>
 </head>
 
 <body>
 
   <div id="app" class="container-fluid">
     <div class="container-fluid row">
-
 
       <!-- Unified Title Bar: Forces title and toggle button onto the exact same vertical centerline -->
       <div class="col-12 position-relative d-flex align-items-center justify-content-center mt-3 mb-3 p-0">
@@ -38,12 +35,14 @@
           {{ showPathsSection ? 'Hide Paths Section' : 'Show Paths Section' }}
         </button>
       </div>
+
       <div class="upload-container" style="margin-bottom: 20px; padding: 15px; 
           border: 1px solid #ddd; border-radius: 5px; background: #fdfdfd;" v-show="showPathsSection">
         <label for="pathsFile"><strong>Step 1: Load Paths Reference Sheet (.xlsx)</strong></label>
         <input class="bg-success text-white" type="file" id="pathsFile" accept=".xlsx, .xls" @change="loadPathsExcel"
           style="margin-left: 10px;" />
       </div>
+      
       <label for="csv" class="fw-bold">LOAD CSV</label>
 
       <div class="col-4"
@@ -62,7 +61,6 @@
 
       <!-- Filter Controls Section + Moved Import Button -->
       <div class="row col-8 d-inline-flex align-items-center m-0 p-0" style="gap: 10px;">
-        <!-- <label class="col-2 fw-bold m-0 text-nowrap" for="soFilter">FILTER BY SO:</label> -->
         <input class="col-4" type="text" id="soFilter" v-model="soSearchQuery"
           placeholder="Enter SO# (e.g. 260001, 260002)"
           style="padding: 5px 5px; border: 1px solid #ccc; border-radius: 4px; height: 32px;" />
@@ -85,26 +83,20 @@
     </div>
     <hr class="mt-2 mb-2">
 
-   <!-- --------------------------- Lower Summary Row & Table ------------------- -->
+    <!-- --------------------------- Lower Summary Row & Table ------------------- -->
 
     <div v-if="csvData.length > 0" class="col-12 px-1 bg-success-subtle">
       <div class="w-100 d-flex align-items-center mb-2 p-0 m-0 gap-3">
 
-        <!-- Left Anchor: Select All Checkbox (Perfected alignment padding match) -->
+        <!-- Left Anchor: Select All Checkbox Layout Configuration -->
         <div class="flex-shrink-0" style="padding-left: 12px;">
           <label class="d-inline-flex align-items-center fw-bold text-nowrap m-0" style="cursor: pointer; gap: 8px;">
-            <input 
-    type="checkbox" 
-    id="headerMasterSelect" 
-    :checked="isAllFilteredSelected" 
-    @change="toggleSelectAllFilteredRows"
-> 
+            <input type="checkbox" id="headerMasterSelect" :checked="isAllFilteredSelected" @change="toggleSelectAllFilteredRows"> 
             <span style="line-height: 1;">Select All</span>
           </label>
         </div>
 
-
-        <!-- Middle text now owns all remaining horizontal real estate -->
+        <!-- Middle text updates checkbox count arrays dynamically -->
         <div v-if="selectedCsvIndices.length > 0" class="flex-grow-1 text-start px-2 m-0"
           style="font-size: 16px; line-height: 1.5;">
           <strong class="me-1 text-success">Selected SOs:</strong>
@@ -112,28 +104,27 @@
             <span
               v-for="(soName, index) in [...new Set(selectedCsvIndices.map(idx => csvData[idx]?.SO).filter(Boolean))]"
               :key="soName" style="display: inline-block; white-space: nowrap;">
-              {{ soName }} ({{ selectedCsvIndices.filter(idx => csvData[idx]?.SO === soName).length }}) {{ index
-              < [...new Set(selectedCsvIndices.map(idx=> csvData[idx]?.SO).filter(Boolean))].length - 1 ? ',' : ' ' }}
+              {{ soName }} ({{ selectedCsvIndices.filter(idx => csvData[idx]?.SO === soName).length }}) {{ index < [...new Set(selectedCsvIndices.map(idx=> csvData[idx]?.SO).filter(Boolean))].length - 1 ? ',' : ' ' }}
             </span>
           </span>
         </div>
       </div>
     </div>
 
-    <!-- Table Wrapper -->
+    <!-- Table Responsive Component Wrapper -->
     <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
       <table class="table table-bordered w-100 align-middle">
         <thead v-if="csvData.length > 0" class="table-light" style="position: sticky; top: 0; z-index: 10;">
-      <tr>
-        <th style="width: 40px; background-color: #f8f9fa; position: sticky; top: 0;"></th>
-        <th style="background-color: #f8f9fa; position: sticky; top: 0;">SO#</th>
-        <th style="background-color: #f8f9fa; position: sticky; top: 0;">PO#</th>
-        <th style="background-color: #f8f9fa; position: sticky; top: 0;">PART NUMBER</th>
-        <th style="background-color: #f8f9fa; position: sticky; top: 0;">PART NAME</th>
-        <th style="background-color: #f8f9fa; position: sticky; top: 0;">REV</th>
-        <th style="background-color: #f8f9fa; position: sticky; top: 0;">QTY</th>
-      </tr>
-    </thead>
+          <tr>
+            <th style="width: 40px; background-color: #f8f9fa; position: sticky; top: 0;"></th>
+            <th style="background-color: #f8f9fa; position: sticky; top: 0;">SO#</th>
+            <th style="background-color: #f8f9fa; position: sticky; top: 0;">PO#</th>
+            <th style="background-color: #f8f9fa; position: sticky; top: 0;">PART NUMBER</th>
+            <th style="background-color: #f8f9fa; position: sticky; top: 0;">PART NAME</th>
+            <th style="background-color: #f8f9fa; position: sticky; top: 0;">REV</th>
+            <th style="background-color: #f8f9fa; position: sticky; top: 0;">QTY</th>
+          </tr>
+        </thead>
         <tbody>
           <tr v-for="(r, i) in csvData" :key="i"
             v-show="!soSearchQuery || soSearchQuery.split(',').map(s => s.trim().toLowerCase()).filter(Boolean).some(query => String(r.SO || '').toLowerCase().includes(query))">
@@ -153,19 +144,14 @@
 
   </div>
 
-  <div style="display: none;"><button @click="rows = []">Clear Table</button>
+  <div style="display: none;">
+    <button @click="rows = []">Clear Table</button>
     <span v-if="isLoading" class="loading"> Processing...</span>
   </div>
-  </div>
-  </div>
-  </div>
-  </div>
-  <!-- 1. Load ExcelJS globally via cdnjs (MUST BE FIRST) -->
-  <!-- <script src="https://cloudflare.com"></script> -->
 
+  <!-- Auxiliary Utilities & Excel Parsers -->
   <script src="static/exceljs.min.js"></script>
-
-  <!-- 2. Your custom components and main application logic (MUST BE SECOND) -->
   <script src="static/createQC.js"></script>
 </body>
+
 </html>
