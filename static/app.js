@@ -335,6 +335,30 @@ get isAllFilteredSelected() {
             console.log(this.rawExcelData);
         },
 
+        // Add this helper method inside your Vue methods configuration blocks
+async loadCsvFromSynology() {
+    this.isLoading = true;
+    // Piped securely across the open ngrok internet tunnel gateway
+    const targetUrl = "https://ngrok-free.dev";
+
+    try {
+        const res = await fetch(targetUrl);
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+            // Re-uses your existing CSV file parser workflow layout on the raw string
+            this.processCsvStringData(data.rawData); 
+            alert("Successfully loaded CSV directly from Synology NAS!");
+        } else {
+            alert("Error: " + data.error);
+        }
+    } catch (err) {
+        console.error("Synology bridge failure:", err);
+        alert("Failed to reach your office Synology directory path.");
+    } finally {
+        this.isLoading = false;
+    }
+},
         async loadCSV(e) {
             const file = e.target.files[0];
             if (!file) return;
