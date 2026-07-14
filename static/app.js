@@ -172,7 +172,7 @@ toggleSelectAllFilteredRows(event) {
 },
 
 // Add this alongside your data() or as an evaluation getter inside your methods layer:
-get isAllFilteredSelected() {
+isAllFilteredSelected() {
     if (!this.csvData || this.csvData.length === 0) return false;
     
     // Check filtered visibility sequences cleanly
