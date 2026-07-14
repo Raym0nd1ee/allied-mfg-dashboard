@@ -339,7 +339,7 @@ get isAllFilteredSelected() {
 async loadCsvFromSynology() {
     this.isLoading = true;
     // Piped securely across the open ngrok internet tunnel gateway
-    const targetUrl = "https://ngrok-free.dev";
+   const targetUrl = "https://ngrok-free.dev";
 
     try {
         const res = await fetch(targetUrl);
