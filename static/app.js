@@ -126,13 +126,11 @@ createApp({
                     console.log("Structured JSON mapping payload ready for Server upload:", structuredPaths);
 
                     // 4. POST the updated path reference JSON configuration file back to your local Flask app
-                    const res = await fetch(targetUrl, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({ records: selectedRowsData })
-                });
+                    const res = await fetch("http://127.0.0.1:5000/save_paths_json", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ paths: structuredPaths })
+                    });
 
                     const result = await res.json();
                     if (res.ok && result.success) {
@@ -148,9 +146,7 @@ createApp({
             reader.readAsArrayBuffer(file);
         }
         ,
-       // 🟢 PUSH THESE TWO BLOCKS INSIDE YOUR VUE CONTROLLER APP.JS FILE:
-
-toggleSelectAllFilteredRows(event) {
+       toggleSelectAllFilteredRows(event) {
     const isChecked = event.target.checked;
 
     // 1. Calculate which row index sequences match your current screen text filter inputs
@@ -172,7 +168,7 @@ toggleSelectAllFilteredRows(event) {
 },
 
 // Add this alongside your data() or as an evaluation getter inside your methods layer:
-isAllFilteredSelected() {
+get isAllFilteredSelected() {
     if (!this.csvData || this.csvData.length === 0) return false;
     
     // Check filtered visibility sequences cleanly
@@ -528,15 +524,13 @@ async loadCsvFromSynology() {
             console.log("Routing payload data straight to Python endpoint:", targetUrl);
 
             try {
-                // 🟢 FIXED: Add the explicit ngrok bypass header into your network fetch payload
-const res = await fetch(targetUrl, {
-    method: "POST",
-    headers: {
-        "Content-Type": "application/json",
-        "ngrok-skip-browser-warning": "true" // 👈 ADD THIS EXACT LINE HERE
-    },
-    body: JSON.stringify({ records: selectedRowsData })
-});
+                const res = await fetch(targetUrl, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ records: selectedRowsData })
+                });
 
                 const data = await res.json();
 
