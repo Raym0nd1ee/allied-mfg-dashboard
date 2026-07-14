@@ -524,13 +524,15 @@ async loadCsvFromSynology() {
             console.log("Routing payload data straight to Python endpoint:", targetUrl);
 
             try {
-                const res = await fetch(targetUrl, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({ records: selectedRowsData })
-                });
+                // 🟢 FIXED: Add the explicit ngrok bypass header into your network fetch payload
+const res = await fetch(targetUrl, {
+    method: "POST",
+    headers: {
+        "Content-Type": "application/json",
+        "ngrok-skip-browser-warning": "true" // 👈 ADD THIS EXACT LINE HERE
+    },
+    body: JSON.stringify({ records: selectedRowsData })
+});
 
                 const data = await res.json();
 
