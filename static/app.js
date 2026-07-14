@@ -146,19 +146,24 @@ createApp({
             reader.readAsArrayBuffer(file);
         }
         ,
-       toggleSelectAllFilteredRows(event) {
+       // 🟢 PUSH THESE TWO BLOCKS INSIDE YOUR VUE CONTROLLER APP.JS FILE:
+
+toggleSelectAllFilteredRows(event) {
     const isChecked = event.target.checked;
 
-    // 1. Calculate which row index sequences match your current screen text filter inputs
+    // 1. Calculate which row index numbers are matching your search bar text string
     const filteredIndices = this.csvData
         .map((row, index) => ({ row, index }))
         .filter(item => {
-            if (!this.soFilterInput) return true; // Change 'soFilterInput' to your actual search model variable string name
-            return String(item.row.SO || "").toLowerCase().includes(this.soFilterInput.toLowerCase());
+            if (!this.soSearchQuery) return true;
+            
+            // Splits commas to support searching multiple sales orders simultaneously
+            const queries = this.soSearchQuery.split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
+            return queries.some(q => String(item.row.SO || "").toLowerCase().includes(q));
         })
         .map(item => item.index);
 
-    // 2. Safely merge index tracking arrays dynamically
+    // 2. Safe calculation loop to merge indices cleanly
     if (isChecked) {
         const newSelectionCollection = new Set([...this.selectedCsvIndices, ...filteredIndices]);
         this.selectedCsvIndices = Array.from(newSelectionCollection);
@@ -167,16 +172,15 @@ createApp({
     }
 },
 
-// Add this alongside your data() or as an evaluation getter inside your methods layer:
 get isAllFilteredSelected() {
     if (!this.csvData || this.csvData.length === 0) return false;
     
-    // Check filtered visibility sequences cleanly
     const filteredIndices = this.csvData
         .map((row, index) => ({ row, index }))
         .filter(item => {
-            if (!this.soFilterInput) return true;
-            return String(item.row.SO || "").toLowerCase().includes(this.soFilterInput.toLowerCase());
+            if (!this.soSearchQuery) return true;
+            const queries = this.soSearchQuery.split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
+            return queries.some(q => String(item.row.SO || "").toLowerCase().includes(q));
         })
         .map(item => item.index);
 
