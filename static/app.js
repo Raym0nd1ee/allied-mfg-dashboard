@@ -495,8 +495,7 @@ get isAllFilteredSelected() {
             this.isLoading = true;
 
             // THE FULL CORRECT TARGET URL (Pointing directly to your updated Python Flask JSON lookup route)
-            // const targetUrl = "http://127.0.0.1:5000/import_dimension_files";
-             const targetUrl = "https://ngrok-free.dev";
+            const targetUrl = "http://127.0.0.1:5000/import_dimension_files";
             console.log("Routing payload data straight to Python endpoint:", targetUrl);
 
             try {
