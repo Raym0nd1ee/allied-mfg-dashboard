@@ -526,7 +526,7 @@ async loadCsvFromSynology() {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "ngrok-skip-browser-warning": "true"
+                "ngrok-skip-browser-warning": "true" 
             },
             body: JSON.stringify({ records: selectedRowsData })
         });
