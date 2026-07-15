@@ -525,7 +525,8 @@ async loadCsvFromSynology() {
         const res = await fetch(targetUrl, {
             method: "POST",
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                "ngrok-skip-browser-warning": "true"
             },
             body: JSON.stringify({ records: selectedRowsData })
         });
