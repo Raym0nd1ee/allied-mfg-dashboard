@@ -183,7 +183,6 @@ get isAllFilteredSelected() {
     if (filteredIndices.length === 0) return false;
     return filteredIndices.every(idx => this.selectedCsvIndices.includes(idx));
 },
-        ...createQcMethods,
         selectDimensionFiles(e) {
 
             const files =
