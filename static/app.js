@@ -146,7 +146,7 @@ createApp({
             reader.readAsArrayBuffer(file);
         }
         ,
-        toggleSelectAllFilteredRows(event) {
+       toggleSelectAllFilteredRows(event) {
     const isChecked = event.target.checked;
 
     // 1. Calculate which row index sequences match your current screen text filter inputs
@@ -182,8 +182,7 @@ get isAllFilteredSelected() {
 
     if (filteredIndices.length === 0) return false;
     return filteredIndices.every(idx => this.selectedCsvIndices.includes(idx));
-},
-        ...createQcMethods,
+},        
         selectDimensionFiles(e) {
 
             const files =
@@ -335,6 +334,30 @@ get isAllFilteredSelected() {
             console.log(this.rawExcelData);
         },
 
+        // Add this helper method inside your Vue methods configuration blocks
+async loadCsvFromSynology() {
+    this.isLoading = true;
+    // Piped securely across the open ngrok internet tunnel gateway
+   const targetUrl = "https://ngrok-free.dev";
+
+    try {
+        const res = await fetch(targetUrl);
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+            // Re-uses your existing CSV file parser workflow layout on the raw string
+            this.processCsvStringData(data.rawData); 
+            alert("Successfully loaded CSV directly from Synology NAS!");
+        } else {
+            alert("Error: " + data.error);
+        }
+    } catch (err) {
+        console.error("Synology bridge failure:", err);
+        alert("Failed to reach your office Synology directory path.");
+    } finally {
+        this.isLoading = false;
+    }
+},
         async loadCSV(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -485,51 +508,44 @@ get isAllFilteredSelected() {
 
         // 2. Update your method within methods:
         async importSelectedCSVToExcel() {
-            if (!this.selectedCsvIndices || this.selectedCsvIndices.length === 0) {
-                alert("Please select at least one row checkbox first.");
-                return;
-            }
+    if (!this.selectedCsvIndices || this.selectedCsvIndices.length === 0) {
+        alert("Please select at least one row checkbox first.");
+        return;
+    }
 
-            // Map checked row indices into a dataset payload array
-            const selectedRowsData = this.selectedCsvIndices.map(index => this.csvData[index]);
-            this.isLoading = true;
+    // Map checked row indices into a dataset payload array
+    const selectedRowsData = this.selectedCsvIndices.map(index => this.csvData[index]);
+    this.isLoading = true;
 
-            // THE FULL CORRECT TARGET URL (Pointing directly to your updated Python Flask JSON lookup route)
-            // const targetUrl = "http://127.0.0.1:5000/import_dimension_files";
-             const targetUrl = "https://ngrok-free.dev";
-            console.log("Routing payload data straight to Python endpoint:", targetUrl);
+    // 🟢 FIXED: Pointing exactly to your active, private office tunnel route!
+    const targetUrl = "https://ngrok-free.dev";            
+    console.log("Routing payload data straight to endpoint:", targetUrl);
 
-            try {
-                const res = await fetch(targetUrl, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "ngrok-skip-browser-warning": "true"
-                    },
-                    body: JSON.stringify({ records: selectedRowsData })
-                });
+    try {
+        const res = await fetch(targetUrl, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "ngrok-skip-browser-warning": "true" 
+            },
+            body: JSON.stringify({ records: selectedRowsData })
+        });
 
-                const data = await res.json();
+        const data = await res.json();
 
-                if (res.ok && data.success)
-                    // {alert(`Process complete!\nUpdated: ${data.updated || 0} files.\nFailed: ${data.failed ? data.failed.length : 0} files.`);
-                    //     this.selectedCsvIndices = []; } 
-                    // 🟢 NEW CORRECT LINE:
-                    if (res.ok && data.success) {
-                        alert(`Process complete!\nUpdated: ${data.updated ? data.updated.length : 0} files.\nFailed: ${data.failed ? data.failed.length : 0} files.`);
-                        this.selectedCsvIndices = []; // Reset checkboxes layout cleanly
-                    }
-                    else {
-                        alert("Backend processing error: " + data.error);
-                    }
-            } catch (err) {
-                console.error("Batch routing network error details:", err);
-                alert("Failed to communicate with your local Flask backend on port 5000.");
-            } finally {
-                this.isLoading = false;
-            }
+        if (res.ok && data.success) {
+            alert(`Process complete!\nUpdated: ${data.updated ? data.updated.length : 0} files.\nFailed: ${data.failed ? data.failed.length : 0} files.`);
+            this.selectedCsvIndices = []; // Reset checkboxes layout cleanly
+        } else {
+            alert("Backend processing error: " + (data.error || "Unknown structural error"));
         }
-        ,
+    } catch (err) {
+        console.error("Batch routing network error details:", err);
+        alert("Failed to communicate with your local backend on port 5000.");
+    } finally {
+        this.isLoading = false;
+    }
+} ,
 
         async exportQCJson() {
 
