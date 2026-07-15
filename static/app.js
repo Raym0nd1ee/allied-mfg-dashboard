@@ -146,7 +146,7 @@ createApp({
             reader.readAsArrayBuffer(file);
         }
         ,
-        toggleSelectAllFilteredRows(event) {
+       toggleSelectAllFilteredRows(event) {
     const isChecked = event.target.checked;
 
     // 1. Calculate which row index sequences match your current screen text filter inputs
@@ -182,7 +182,8 @@ get isAllFilteredSelected() {
 
     if (filteredIndices.length === 0) return false;
     return filteredIndices.every(idx => this.selectedCsvIndices.includes(idx));
-},        
+},
+        ...createQcMethods,
         selectDimensionFiles(e) {
 
             const files =
@@ -502,8 +503,7 @@ get isAllFilteredSelected() {
                 const res = await fetch(targetUrl, {
                     method: "POST",
                     headers: {
-                        "Content-Type": "application/json",
-                        "ngrok-skip-browser-warning": "true"
+                        "Content-Type": "application/json"
                     },
                     body: JSON.stringify({ records: selectedRowsData })
                 });
